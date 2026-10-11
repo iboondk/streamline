@@ -1,0 +1,21 @@
+{
+  "name": "streamline-consumer-node",
+  "version": "0.1.0",
+  "description": "Node inventory consumer: shop.inventory.v1 to ClickHouse inventory_raw, idempotent batches, DLQ for poison messages",
+  "type": "module",
+  "license": "MIT",
+  "author": "iboondk",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@clickhouse/client": "1.6.0",
+    "@kafkajs/confluent-schema-registry": "3.3.0",
+    "kafkajs": "2.2.4"
+  }
+}

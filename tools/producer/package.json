@@ -1,0 +1,22 @@
+{
+  "name": "streamline-producer",
+  "version": "0.1.0",
+  "description": "Seeded Avro order and inventory event producer for the Streamline pipeline",
+  "type": "module",
+  "license": "MIT",
+  "author": "iboondk",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "start": "node src/cli.js"
+  },
+  "dependencies": {
+    "@kafkajs/confluent-schema-registry": "3.3.0",
+    "kafkajs": "2.2.4"
+  },
+  "devDependencies": {
+    "avsc": "5.7.7"
+  }
+}

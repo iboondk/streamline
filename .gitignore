@@ -1,0 +1,21 @@
+# Local credentials and environment. Copy .env.example to .env; never commit the real file.
+.env
+
+# Dependencies (the Go module cache lives outside the repo)
+node_modules/
+
+# Recording output. The GIF and the source video are both kept out of git.
+docs/media/*.mov
+
+# Benchmark output written by make measure. The folder stays, via results/.gitkeep.
+results/*.json
+results/*.csv
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python
+__pycache__/

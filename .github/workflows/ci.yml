@@ -1,0 +1,67 @@
+# CI runs the checks that need no Docker-hosted infrastructure:
+# static validation (JSON, YAML, Avro, SQL names, shell syntax) and the Go and Node unit tests.
+# A separate job validates the compose file. Nothing here starts Kafka, Schema Registry,
+# ClickHouse or Grafana, and nothing here deploys anywhere or needs credentials.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Static checks and unit tests
+    runs-on: ubuntu-latest
+    env:
+      # The Makefile defaults its caches to /Volumes/Hazel/caches (a local drive).
+      # Point them at the runner's temp directory instead.
+      GOMODCACHE: ${{ runner.temp }}/go-mod
+      npm_config_cache: ${{ runner.temp }}/npm-cache
+      PIP_CACHE_DIR: ${{ runner.temp }}/pip-cache
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go (version from consumer-go/go.mod)
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: consumer-go/go.mod
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install locked dependencies
+        run: make install
+
+      - name: Install PyYAML for the YAML checks
+        run: pip install pyyaml==6.0.2
+
+      - name: Static checks
+        run: make check
+
+      - name: Unit tests (Go and Node, no infrastructure)
+        run: make test
+
+  compose-config:
+    name: Compose file validates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      # No .env is created here on purpose. A clean clone runs the compose file
+      # without one, so CI must validate that same path.
+      - name: Validate docker-compose.yml (clean clone, no .env)
+        run: docker compose config --quiet

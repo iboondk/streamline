@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "OrderEvent",
+  "namespace": "com.streamline.shop",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "event_type", "type": {"type": "enum", "name": "OrderEventType", "symbols": ["ORDER_CREATED", "ORDER_PAID", "ORDER_CANCELLED"]}},
+    {"name": "order_id", "type": "string"},
+    {"name": "customer_id", "type": "string"},
+    {"name": "shop_id", "type": "string"},
+    {"name": "currency", "type": "string"},
+    {"name": "total_cents", "type": "long"},
+    {"name": "line_items", "type": {"type": "array", "items": {
+      "type": "record",
+      "name": "LineItem",
+      "fields": [
+        {"name": "sku", "type": "string"},
+        {"name": "quantity", "type": "int"},
+        {"name": "unit_price_cents", "type": "long"}
+      ]
+    }}},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}}
+  ]
+}

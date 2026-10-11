@@ -1,0 +1,155 @@
+{
+  "__inputs": [],
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Orders per minute",
+      "description": "Distinct orders per minute from orders_per_minute (uniqExactMerge over the per-minute aggregate state).",
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "custom": { "drawStyle": "bars", "fillOpacity": 60 } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+          "editorType": "sql",
+          "rawQuery": true,
+          "format": 0,
+          "rawSql": "SELECT minute AS time, uniqExactMerge(orders) AS orders FROM streamline.orders_per_minute WHERE $__timeFilter(minute) GROUP BY minute ORDER BY minute"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Revenue per minute (materialized view)",
+      "description": "Revenue from orders_per_minute revenue_cents, in currency units. A plain sum: it can overcount after a full replay with different batch boundaries. Compare with the exact revenue stat below.",
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "currencyUSD", "custom": { "drawStyle": "line", "fillOpacity": 15 } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+          "editorType": "sql",
+          "rawQuery": true,
+          "format": 0,
+          "rawSql": "SELECT minute AS time, sum(revenue_cents)/100 AS revenue FROM streamline.orders_per_minute WHERE $__timeFilter(minute) GROUP BY minute ORDER BY minute"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Exact revenue (ORDER_PAID, FINAL)",
+      "description": "Sum of total_cents for ORDER_PAID events in the selected range, read from orders_raw FINAL so duplicates are collapsed.",
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "currencyUSD", "decimals": 2 }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "colorMode": "value", "graphMode": "none", "textMode": "auto" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+          "editorType": "sql",
+          "rawQuery": true,
+          "format": 1,
+          "rawSql": "SELECT sum(total_cents)/100 AS exact_revenue FROM streamline.orders_raw FINAL WHERE event_type='ORDER_PAID' AND $__timeFilter(occurred_at)"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Duplicates collapsed",
+      "description": "Raw rows minus rows after FINAL. Shows how many duplicate deliveries the ReplacingMergeTree has collapsed. Reads the whole table, so it is not limited by the time picker.",
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "colorMode": "value", "graphMode": "none", "textMode": "auto" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+          "editorType": "sql",
+          "rawQuery": true,
+          "format": 1,
+          "rawSql": "SELECT count() - (SELECT count() FROM streamline.orders_raw FINAL) AS duplicates_collapsed FROM streamline.orders_raw"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Ingest lag per minute (seconds)",
+      "description": "Maximum of ingested_at minus occurred_at per minute, from orders_raw. Measures how far behind event time the pipeline writes rows.",
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "s", "custom": { "drawStyle": "line", "fillOpacity": 10 } },
+        "overrides": []
+      },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+          "editorType": "sql",
+          "rawQuery": true,
+          "format": 0,
+          "rawSql": "SELECT toStartOfMinute(occurred_at) AS time, max(dateDiff('millisecond', occurred_at, ingested_at)) / 1000 AS lag_seconds FROM streamline.orders_raw WHERE $__timeFilter(occurred_at) GROUP BY time ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "table",
+      "title": "Top 10 SKUs by net stock change",
+      "description": "Sum of net_delta per SKU from inventory_by_sku. Negative values are reservations that exceed restocks.",
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 14 },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "align": "auto" } }, "overrides": [] },
+      "options": { "showHeader": true, "sortBy": [{ "displayName": "net_delta", "desc": true }] },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "streamline-ch" },
+          "editorType": "sql",
+          "rawQuery": true,
+          "format": 1,
+          "rawSql": "SELECT sku, sum(net_delta) AS net_delta FROM streamline.inventory_by_sku GROUP BY sku ORDER BY net_delta DESC LIMIT 10"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["streamline"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Streamline",
+  "uid": "streamline-main",
+  "version": 1,
+  "weekStart": ""
+}

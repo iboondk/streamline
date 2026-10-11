@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "InventoryEvent",
+  "namespace": "com.streamline.shop",
+  "fields": [
+    {"name": "event_id", "type": "string"},
+    {"name": "event_type", "type": {"type": "enum", "name": "InventoryEventType", "symbols": ["STOCK_RESERVED", "STOCK_RELEASED", "STOCK_RESTOCKED"]}},
+    {"name": "sku", "type": "string"},
+    {"name": "warehouse_id", "type": "string"},
+    {"name": "delta", "type": "int"},
+    {"name": "occurred_at", "type": {"type": "long", "logicalType": "timestamp-millis"}}
+  ]
+}
