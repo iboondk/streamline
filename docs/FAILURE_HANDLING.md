@@ -59,7 +59,6 @@ A difference of zero means the MV and the raw table agree. A non-zero difference
 
 - consumer-node sends every decode error to the DLQ, including a Schema Registry outage. consumer-go retries registry outages instead. The Node consumer needs the same split between "bad record" and "retryable error" to match the Go consumer.
 - Dedupe layer 2 only covers the last 10000 blocks per table. Replays older than that depend on layer 3 and the MV limit above.
-- The Go consumer's Dockerfile builds with `golang:1.22-alpine` while `consumer-go/go.mod` declares `go 1.24`. The official image sets `GOTOOLCHAIN=local`, which would refuse that go.mod. The Dockerfile now sets `ENV GOTOOLCHAIN=auto` so the build stage fetches the Go 1.24 toolchain. The image build has not been run here because Docker is unavailable.
 
 ## Verified here
 
@@ -67,16 +66,16 @@ The authoring machine has Go 1.26.5, Node 24.15.0, npm 11.12.1, Python 3.10.5 an
 
 Ran locally and passed:
 
-- `go test ./...` in `consumer-go`: 18 tests across 6 packages with tests (`app`, `batch`, `dlq`, `model`, `registry`, `wire`), all passing. These are unit tests and need no Docker.
+- `go test ./...` in `consumer-go`: 18 tests in the packages with tests (`app`, `batch`, `dlq`, `model`, `registry`, `wire`), all passing. These are unit tests and need no Docker.
 - `npm test` in `tools/producer` (11 tests), `tools/measure` (15 tests) and `consumer-node` (20 tests), all passing.
 - `make test`, which runs the Go and Node unit tests above, exits 0.
-- `make check` (`python3 scripts/check-static.py`): JSON, YAML, Avro schema fields, SQL table names and `bash -n` on every script.
+- `make check` (`python3 scripts/check-static.py`): JSON, YAML, Avro schema fields, the compose env for both consumers, SQL table names and `bash -n` on every script.
 - `bash -n scripts/replay-demo.sh`.
-- `make -n` for `up`, `bootstrap`, `test`, `check` and `replay` prints the commands without errors.
+- `make -n up bootstrap test check replay` prints the commands without errors.
 
 Not run, because Docker is unavailable here:
 
-- `docker compose up`, the health checks, and both consumer image builds.
+- `docker compose up`, the health checks, and both consumer image builds (`consumer-go/Dockerfile` and `consumer-node/Dockerfile`).
 - `make bootstrap` (topic creation and schema registration against a live broker and registry).
 - `make produce`, `make measure`, and the replay proof in `make replay`.
 - Every failure mode above. The behaviours are described from the code and have not been exercised against a broker, a registry or ClickHouse.

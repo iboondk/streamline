@@ -110,7 +110,10 @@ func run(log *slog.Logger) error {
 	if err != nil {
 		return fmt.Errorf("kafka client: %w", err)
 	}
-	defer cl.Close()
+	// CloseAllowingRebalance, not Close: loop may return while a poll is still
+	// outstanding (BlockRebalanceOnPoll), and Close would hang waiting to leave
+	// the group in that state.
+	defer cl.CloseAllowingRebalance()
 
 	dlqProducer := dlq.New(cl, dlq.Topic(cfg.topic))
 	decoder := app.NewAvroDecoder(registry.New(cfg.registryURL, &http.Client{Timeout: 10 * time.Second}))
@@ -160,7 +163,13 @@ func loop(ctx context.Context, log *slog.Logger, cl *kgo.Client, dec app.Decoder
 				backoff = min(backoff*2, maxBackoff)
 				continue
 			}
-			if err := cl.CommitRecords(ctx, recs...); err != nil {
+			// The batch is already in ClickHouse. Commit with a context detached
+			// from shutdown so a SIGTERM right after a successful insert does not
+			// force a redelivery; the timeout bounds how long shutdown can wait.
+			cctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+			err := cl.CommitRecords(cctx, recs...)
+			cancel()
+			if err != nil {
 				log.Error("commit failed; records will be redelivered", "err", err)
 			}
 		}

@@ -82,6 +82,28 @@ wait_group_inactive() {
   exit 1
 }
 
+# Waits until the summed lag on the topic is 0, or fails after LAG_TIMEOUT_SEC.
+wait_lag_zero() {
+  local start_ts lag
+  start_ts=$(date +%s)
+  while true; do
+    lag="$(lag_total || true)"
+    if [[ "$lag" == "0" ]]; then
+      echo "lag reached 0"
+      return 0
+    fi
+    if (( $(date +%s) - start_ts >= LAG_TIMEOUT_SEC )); then
+      echo "FAIL: lag did not reach 0 within ${LAG_TIMEOUT_SEC}s (last lag: ${lag:-unknown})" >&2
+      exit 1
+    fi
+    sleep 2
+  done
+}
+
+echo "== (0) wait for ${GROUP} to catch up before the baseline (timeout ${LAG_TIMEOUT_SEC}s)"
+echo "   A baseline taken while consumer-go is still behind would make the replay look wrong."
+wait_lag_zero
+
 echo "== (a) counts before replay"
 BEFORE="$(query_basic)"
 UNIQ_BEFORE="$(printf '%s\n' "$BEFORE" | cut -f2)"
@@ -99,19 +121,7 @@ kafka_groups --group "$GROUP" --topic "$TOPIC" --reset-offsets --to-earliest --e
 
 echo "== (d) start consumer-go and wait for lag 0 (timeout ${LAG_TIMEOUT_SEC}s)"
 docker compose up -d consumer-go
-start_ts=$(date +%s)
-while true; do
-  lag="$(lag_total || true)"
-  if [[ "$lag" == "0" ]]; then
-    echo "lag reached 0"
-    break
-  fi
-  if (( $(date +%s) - start_ts >= LAG_TIMEOUT_SEC )); then
-    echo "FAIL: lag did not reach 0 within ${LAG_TIMEOUT_SEC}s (last lag: ${lag:-unknown})" >&2
-    exit 1
-  fi
-  sleep 2
-done
+wait_lag_zero
 
 echo "== (e) counts after replay, then OPTIMIZE and FINAL count"
 AFTER="$(query_basic)"

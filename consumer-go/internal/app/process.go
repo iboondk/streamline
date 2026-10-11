@@ -49,6 +49,16 @@ func Process(ctx context.Context, recs []*kgo.Record, dec Decoder, s sink.Sink, 
 // It returns an error if any DLQ send or insert fails, and the caller must
 // then not commit. Re-processing the same records is safe: inserts carry
 // dedupe tokens and the DLQ may receive a duplicate.
+//
+// Known limit: the dedupe token is derived from the first and last offsets of
+// each chunk in this poll. A retry after a rewind can fetch a different record
+// set, so the chunk boundaries and tokens change and ClickHouse's
+// insert_deduplication_token will not catch that re-insert. The
+// ReplacingMergeTree (ORDER BY event_id) removes such duplicates eventually,
+// but materialized views fed from the raw table (see
+// sql/002_materialized_views.sql) can double-count until the merge runs.
+// Aligning chunks to offset multiples of max would make retried ranges
+// produce identical tokens; that is not implemented yet.
 func ProcessWithMax(ctx context.Context, recs []*kgo.Record, dec Decoder, s sink.Sink, dlq DLQ, max int) error {
 	rows := make(map[*kgo.Record]model.OrderRow, len(recs))
 	valid := make([]*kgo.Record, 0, len(recs))

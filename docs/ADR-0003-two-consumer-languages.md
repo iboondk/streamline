@@ -11,7 +11,7 @@ The pipeline has two topics with the same delivery rules. The brief calls for a 
 - `consumer-go` (franz-go, hamba/avro, clickhouse-go v2) consumes `shop.orders.v1`, group `streamline-orders`.
 - `consumer-node` (kafkajs, @kafkajs/confluent-schema-registry, @clickhouse/client) consumes `shop.inventory.v1`, group `streamline-inventory`.
 - Both write to ClickHouse with the same dedupe-token scheme. Their Dockerfiles are separate: a distroless static image for Go and `node:20-alpine` with `npm ci --omit=dev` for Node.
-- Go is pure Go with no cgo and no librdkafka. The Go Dockerfile sets `GOTOOLCHAIN=auto` because the build image is Go 1.22 and `go.mod` requires 1.24.
+- Go is pure Go with no cgo and no librdkafka.
 
 ## Consequences
 

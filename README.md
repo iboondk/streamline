@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/iboondk/streamline/actions/workflows/ci.yml/badge.svg)](https://github.com/iboondk/streamline/actions/workflows/ci.yml)
 
+_The badge shows live status once this repository has run CI on GitHub. Until the first run it may show no status._
+
 Streamline is a Kafka pipeline for a Shopify-style shop. Order and inventory events are Avro-encoded through Schema Registry, consumed by a Go service and a Node service, written idempotently to ClickHouse, rolled up by materialized views, and shown in a provisioned Grafana dashboard.
 
 The point of the project is the delivery story: Kafka gives at-least-once delivery, and the pipeline turns that into effectively-once results through three idempotent layers. See [docs/ADR-0002](docs/ADR-0002-effectively-once-with-three-dedupe-layers.md) and [docs/FAILURE_HANDLING.md](docs/FAILURE_HANDLING.md).
