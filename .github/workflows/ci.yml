@@ -18,8 +18,8 @@ jobs:
     name: Static checks and unit tests
     runs-on: ubuntu-latest
     env:
-      # The Makefile defaults its caches to /Volumes/Hazel/caches (a local drive).
-      # Point them at the runner's temp directory instead.
+      # Point the cache variables at the runner's temp directory so the caches
+      # live on the runner disk and are not shared with the author's local drive.
       GOMODCACHE: ${{ runner.temp }}/go-mod
       npm_config_cache: ${{ runner.temp }}/npm-cache
       PIP_CACHE_DIR: ${{ runner.temp }}/pip-cache

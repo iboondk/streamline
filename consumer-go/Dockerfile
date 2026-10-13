@@ -1,5 +1,5 @@
 # Build stage: static binary, no cgo.
-FROM golang:1.24-alpine AS build
+FROM golang:1.22-alpine AS build
 WORKDIR /src
 ENV CGO_ENABLED=0
 COPY go.mod go.sum ./

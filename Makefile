@@ -1,9 +1,9 @@
 # Streamline pipeline. Run every target from the project root.
-# Caches sit on the Hazel drive to keep the main disk free. Override from the
-# environment if the path differs on your machine.
-GOMODCACHE ?= /Volumes/Hazel/caches/go
-npm_config_cache ?= /Volumes/Hazel/caches/npm
-PIP_CACHE_DIR ?= /Volumes/Hazel/caches/pip
+
+# Optional machine-local settings, such as cache locations on a separate drive.
+# The file is git-ignored. Copy .env.make.example to .env.make and edit it.
+# Without it, the tools use their standard cache locations.
+-include .env.make
 export GOMODCACHE npm_config_cache PIP_CACHE_DIR
 
 # Extra arguments for the producer, e.g. make produce ARGS="--rate 200 --duration 10"
@@ -11,10 +11,10 @@ ARGS ?=
 # Arguments for the lag and row-growth sampler (needs a live stack).
 MEASURE_ARGS ?= --group streamline-orders --topic shop.orders.v1 --table orders_raw --duration 60
 
-.PHONY: help install up down bootstrap produce measure replay test check
+.PHONY: help install install-producer up down bootstrap produce measure replay test check
 
 help:
-	@echo "targets: install up bootstrap produce measure replay test check down"
+	@echo "targets: install install-producer up bootstrap produce measure replay test check down"
 
 # Installs the locked dependencies for the Go and Node packages (needed before test).
 install:
@@ -22,6 +22,10 @@ install:
 	cd tools/producer && npm ci
 	cd tools/measure && npm ci
 	cd consumer-node && npm ci
+
+# Installs only the producer's locked Node dependencies. Needs Node.js 20 or newer.
+install-producer:
+	cd tools/producer && npm ci
 
 # Creates the local env file if missing, then starts the stack in the background.
 up:

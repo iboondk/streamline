@@ -51,7 +51,7 @@ Poison messages (bad magic byte, unknown schema id, decode failure) go to the to
 | Analytics DB | `clickhouse/clickhouse-server:24.8` | LTS. ReplacingMergeTree, dedupe tokens, MVs |
 | Dashboard | `grafana/grafana:11.2.0` + plugin `grafana-clickhouse-datasource` 4.4.0 | Provisioned from files |
 | Producer / measure / Node consumer | Node 20+ ESM JavaScript, `kafkajs@2.2.4`, `@kafkajs/confluent-schema-registry@3.3.0`, `@clickhouse/client@1.6.0`, tests via `node:test` | Plain JS keeps the services small. No build step. |
-| Go consumer | Go 1.24+ module, `github.com/twmb/franz-go` (kgo), `github.com/hamba/avro/v2`, `github.com/ClickHouse/clickhouse-go/v2` | Pure Go, no cgo/librdkafka |
+| Go consumer | Go 1.22+ module, `github.com/twmb/franz-go` (kgo), `github.com/hamba/avro/v2`, `github.com/ClickHouse/clickhouse-go/v2` | Pure Go, no cgo/librdkafka |
 | Config | env vars, documented in `.env.example` with local-only dummy values | No real credentials |
 
 ## 3. Data contracts

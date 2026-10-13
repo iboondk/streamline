@@ -1,6 +1,6 @@
-module github.com/iboondk/streamline/consumer-go
+module github.com/iboondk/p4-streamline/consumer-go
 
-go 1.24
+go 1.22.0
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.30.1
@@ -15,7 +15,7 @@ require (
 	github.com/go-faster/errors v0.7.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.19.1 // indirect
+	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect

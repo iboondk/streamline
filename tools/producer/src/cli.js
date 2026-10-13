@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import { createGenerator } from './generator.js';
-import { createProducer } from './producer.js';
 
 const TICK_MS = 100;
 // Fixed epoch (2026-01-01T00:00:00Z) so --dry-run output is reproducible.
@@ -88,6 +87,8 @@ function runDryRun({ rate, duration, seed, mix }) {
 }
 
 async function runLive({ rate, duration, seed, mix }) {
+  // Loaded lazily so --dry-run never touches the Kafka or registry client code.
+  const { createProducer } = await import('./producer.js');
   const producer = await createProducer({
     brokers: process.env.KAFKA_BROKERS ?? 'localhost:9092',
     registryUrl: process.env.SCHEMA_REGISTRY_URL ?? 'http://localhost:8081',

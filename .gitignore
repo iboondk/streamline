@@ -1,6 +1,9 @@
 # Local credentials and environment. Copy .env.example to .env; never commit the real file.
 .env
 
+# Machine-local make settings (cache paths). Copy .env.make.example to .env.make.
+.env.make
+
 # Dependencies (the Go module cache lives outside the repo)
 node_modules/
 

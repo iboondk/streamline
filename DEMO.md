@@ -7,6 +7,7 @@ Target length: about 90 seconds for a GIF, or 3 to 4 minutes for a Loom video.
 ## Before you record
 
 1. Docker Desktop is running with at least 4 GB of memory for containers.
+   Node.js 20+ is installed, and `make install-producer` (the `npm ci` in `tools/producer`) has been run once. Step 5 runs the producer on the host.
 2. A clean state. Run `make down` to remove the containers and their data, then continue.
 3. Terminal font at 16 pt or larger, dark theme, window about 1280 px wide.
 4. Browser at 1280 x 800 with Grafana open on a blank tab.

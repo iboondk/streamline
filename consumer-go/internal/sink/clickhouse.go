@@ -6,7 +6,7 @@ import (
 
 	"github.com/ClickHouse/clickhouse-go/v2"
 
-	"github.com/iboondk/streamline/consumer-go/internal/batch"
+	"github.com/iboondk/p4-streamline/consumer-go/internal/batch"
 )
 
 const insertSQL = `INSERT INTO orders_raw (

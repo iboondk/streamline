@@ -1,6 +1,6 @@
 # Streamline
 
-[![CI](https://github.com/iboondk/streamline/actions/workflows/ci.yml/badge.svg)](https://github.com/iboondk/streamline/actions/workflows/ci.yml)
+[![CI](https://github.com/iboondk/p4-streamline/actions/workflows/ci.yml/badge.svg)](https://github.com/iboondk/p4-streamline/actions/workflows/ci.yml)
 
 _The badge shows live status once this repository has run CI on GitHub. Until the first run it may show no status._
 
@@ -30,11 +30,12 @@ flowchart LR
 
 ## Quick start
 
-Requirements: Docker with Compose v2. For the tests only: Go 1.24 or newer, Node.js 20 or newer, and Python 3.
+Requirements: Docker with Compose v2, and Node.js 20 or newer for the producer (`make produce`). For the tests only: Go 1.22 or newer (the version in `consumer-go/go.mod`) and Python 3.
 
-Start the whole stack with one command, then produce events:
+Install the producer's dependencies once, start the whole stack with one command, then produce events:
 
 ```bash
+make install-producer                # npm ci in tools/producer (needs Node.js 20+)
 docker compose up -d                 # stack, topics, Avro schemas, both consumers
 docker compose ps                    # wait until the services show healthy
 make produce ARGS="--rate 200 --duration 30"
@@ -44,11 +45,13 @@ Then open Grafana at http://localhost:3000 and sign in as `admin` with the Grafa
 
 Notes:
 
+- `make produce` runs on the host, not in Docker, so it needs Node.js 20+ and the packages from `make install-producer` (or `make install`). Without them it fails with `ERR_MODULE_NOT_FOUND`, or `node: command not found` when Node is missing.
 - A clean clone needs no `.env` file. Compose uses the local dummy defaults, which match `.env.example`. To change them, `cp .env.example .env` and edit the copy; a `.env` file is read if present and is ignored by git.
 - The one-shot `init-topics` service creates the Kafka topics and `init-schemas` registers the Avro schemas with BACKWARD compatibility. Both exit with status 0 when they finish. The consumers start only after both have finished, so they do not crash-loop. Check them with `docker compose logs init-topics init-schemas`.
 - `make bootstrap` runs the same steps by hand against a running stack. It is idempotent, so it is safe to run again.
 - ClickHouse runs `sql/*.sql` on first start, which creates the tables and materialized views.
 - `make up` creates `.env` from the example if it is missing, then runs `docker compose up -d`.
+- The Makefile caches default to the standard locations. To keep them on another drive, copy `.env.make.example` to `.env.make` (git-ignored) and set the paths there.
 - `make replay` needs the stack running. It defaults to the `.env.example` ClickHouse credentials, so it works on a clean clone.
 - `make measure` needs the stack running. Its connection defaults match `.env.example`, so it works on a clean clone. The Makefile does not read `.env`; to use other values, export them in your shell first (`set -a; . ./.env; set +a`).
 
@@ -75,7 +78,8 @@ All settings are environment variables, documented in `.env.example` with local 
 | `KAFKA_BROKERS` | all | Broker list |
 | `SCHEMA_REGISTRY_URL` | all | Registry URL |
 | `CLICKHOUSE_URL`, `CLICKHOUSE_ADDR` | Node and Go consumers | HTTP and native endpoints |
-| `CLICKHOUSE_USER`, `CLICKHOUSE_PASSWORD`, `CLICKHOUSE_DB` | consumers, measure, Grafana | ClickHouse access |
+| `CLICKHOUSE_USER`, `CLICKHOUSE_PASSWORD` | consumers, replay, measure, Grafana | ClickHouse access |
+| `CLICKHOUSE_DB` | replay, measure | Database name. Fixed to `streamline`: `sql/*.sql` and both consumers in `docker-compose.yml` hardcode it, so do not change it. |
 | `ORDERS_TOPIC`, `INVENTORY_TOPIC` | producer, consumers | Topic names |
 | `GRAFANA_ADMIN_PASSWORD` | Grafana | Admin login |
 | `BATCH_MAX` | consumer-go | Optional batch size (default 1000) |
