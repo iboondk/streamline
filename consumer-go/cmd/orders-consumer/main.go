@@ -17,10 +17,10 @@ import (
 
 	"github.com/twmb/franz-go/pkg/kgo"
 
-	"github.com/iboondk/p4-streamline/consumer-go/internal/app"
-	"github.com/iboondk/p4-streamline/consumer-go/internal/dlq"
-	"github.com/iboondk/p4-streamline/consumer-go/internal/registry"
-	"github.com/iboondk/p4-streamline/consumer-go/internal/sink"
+	"github.com/iboondk/streamline/consumer-go/internal/app"
+	"github.com/iboondk/streamline/consumer-go/internal/dlq"
+	"github.com/iboondk/streamline/consumer-go/internal/registry"
+	"github.com/iboondk/streamline/consumer-go/internal/sink"
 )
 
 const consumerGroup = "streamline-orders"

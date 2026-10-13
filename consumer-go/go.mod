@@ -1,4 +1,4 @@
-module github.com/iboondk/p4-streamline/consumer-go
+module github.com/iboondk/streamline/consumer-go
 
 go 1.22.0
 

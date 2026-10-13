@@ -22,3 +22,10 @@ Thumbs.db
 
 # Python
 __pycache__/
+
+# Build and tooling output
+vendor/
+target/
+*.tfstate
+.terraform/
+.tmp/

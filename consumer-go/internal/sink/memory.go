@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/iboondk/p4-streamline/consumer-go/internal/batch"
+	"github.com/iboondk/streamline/consumer-go/internal/batch"
 )
 
 // MemorySink is an in-memory Sink for tests. It records each accepted batch

@@ -1,6 +1,6 @@
 # Streamline
 
-[![CI](https://github.com/iboondk/p4-streamline/actions/workflows/ci.yml/badge.svg)](https://github.com/iboondk/p4-streamline/actions/workflows/ci.yml)
+[![CI](https://github.com/iboondk/streamline/actions/workflows/ci.yml/badge.svg)](https://github.com/iboondk/streamline/actions/workflows/ci.yml)
 
 _The badge shows live status once this repository has run CI on GitHub. Until the first run it may show no status._
 

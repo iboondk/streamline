@@ -7,9 +7,9 @@ import (
 
 	"github.com/hamba/avro/v2"
 
-	"github.com/iboondk/p4-streamline/consumer-go/internal/model"
-	"github.com/iboondk/p4-streamline/consumer-go/internal/registry"
-	"github.com/iboondk/p4-streamline/consumer-go/internal/wire"
+	"github.com/iboondk/streamline/consumer-go/internal/model"
+	"github.com/iboondk/streamline/consumer-go/internal/registry"
+	"github.com/iboondk/streamline/consumer-go/internal/wire"
 )
 
 // AvroDecoder decodes Confluent-framed Avro order events, resolving writer

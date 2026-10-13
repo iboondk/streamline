@@ -4,7 +4,7 @@ Status: Accepted
 
 ## Context
 
-The pipeline has two topics with the same delivery rules. The brief calls for a Go service and a Node service, so the project shows how the same semantics (commit after write, block tokens, DLQ) are built in two ecosystems. Splitting the work also keeps each consumer's responsibilities small.
+The pipeline has two topics with the same delivery rules. Using a Go service and a Node service shows how the same semantics (commit after write, block tokens, DLQ) are built in two ecosystems. Splitting the work also keeps each consumer's responsibilities small.
 
 ## Decision
 

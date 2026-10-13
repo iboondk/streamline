@@ -7,9 +7,9 @@ import (
 
 	"github.com/twmb/franz-go/pkg/kgo"
 
-	"github.com/iboondk/p4-streamline/consumer-go/internal/batch"
-	"github.com/iboondk/p4-streamline/consumer-go/internal/model"
-	"github.com/iboondk/p4-streamline/consumer-go/internal/sink"
+	"github.com/iboondk/streamline/consumer-go/internal/batch"
+	"github.com/iboondk/streamline/consumer-go/internal/model"
+	"github.com/iboondk/streamline/consumer-go/internal/sink"
 )
 
 // fakeDecoder treats values starting with "bad" as poison and decodes the

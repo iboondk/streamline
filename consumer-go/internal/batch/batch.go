@@ -7,7 +7,7 @@ import (
 
 	"github.com/twmb/franz-go/pkg/kgo"
 
-	"github.com/iboondk/p4-streamline/consumer-go/internal/model"
+	"github.com/iboondk/streamline/consumer-go/internal/model"
 )
 
 // Batch is one partition's contiguous offset range, ready for a single insert.
